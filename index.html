@@ -427,11 +427,10 @@
         <h2>Game Jersey Size</h2>
         <span class="section-tag">Step 2</span>
       </div>
-      <div class="section-desc">Full-button youth jersey. Select your player's size.</div>
+      <div class="section-desc">Full-button youth jersey. Practice jerseys will use this same size.</div>
       <div class="size-grid" id="jersey-sizes"></div>
       <input type="hidden" name="jersey_size" id="jersey_size" required>
-      <button type="button" class="chart-toggle" data-toggle="chart-jersey">View size chart (chest / length / sleeve)</button>
-      <div class="chart" id="chart-jersey">
+      <div class="chart open" id="chart-jersey">
         <table>
           <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th></tr></thead>
           <tbody>
@@ -451,7 +450,7 @@
         <h2>Practice Jerseys</h2>
         <span class="section-tag">Optional</span>
       </div>
-      <div class="section-desc">Need any new practice jerseys? Select quantity and size.</div>
+      <div class="section-desc">Need any new practice jerseys? They'll be ordered in the same size as your game jersey above.</div>
 
       <div class="field">
         <div class="qty-row">
@@ -464,12 +463,6 @@
         </div>
         <input type="hidden" name="practice_jersey_qty" id="practice_jersey_qty" value="0">
       </div>
-
-      <div class="field hat-size-wrap" id="practice-size-wrap">
-        <label class="label">Practice Jersey Size</label>
-        <div class="size-grid" id="practice-sizes"></div>
-        <input type="hidden" name="practice_jersey_size" id="practice_jersey_size">
-      </div>
     </div>
 
     <!-- HATS -->
@@ -478,7 +471,7 @@
         <h2>Hat Replacements</h2>
         <span class="section-tag">Optional</span>
       </div>
-      <div class="section-desc">Need to replace any hats? Stretch-fit sizing.</div>
+      <div class="section-desc">Need to replace any hats? Pick how many of each color, then one hat size.</div>
 
       <!-- BLACK HAT -->
       <div class="hat-card">
@@ -501,11 +494,6 @@
           </div>
         </div>
         <input type="hidden" name="black_hat_qty" id="black_hat_qty" value="0">
-        <div class="hat-size-wrap" id="black-size-wrap">
-          <label class="label">Hat Size</label>
-          <div class="size-grid hats" id="black-sizes"></div>
-          <input type="hidden" name="black_hat_size" id="black_hat_size">
-        </div>
       </div>
 
       <!-- GREY HAT -->
@@ -529,15 +517,15 @@
           </div>
         </div>
         <input type="hidden" name="grey_hat_qty" id="grey_hat_qty" value="0">
-        <div class="hat-size-wrap" id="grey-size-wrap">
-          <label class="label">Hat Size</label>
-          <div class="size-grid hats" id="grey-sizes"></div>
-          <input type="hidden" name="grey_hat_size" id="grey_hat_size">
-        </div>
       </div>
 
-      <button type="button" class="chart-toggle" data-toggle="chart-hats">View hat size chart (head circumference)</button>
-      <div class="chart" id="chart-hats">
+      <div class="field hat-size-wrap" id="hat-size-wrap" style="margin-top:16px">
+        <label class="label">Hat Size</label>
+        <div class="size-grid hats" id="hat-sizes"></div>
+        <input type="hidden" name="hat_size" id="hat_size">
+      </div>
+
+      <div class="chart open" id="chart-hats">
         <table>
           <thead><tr><th>Size</th><th>Hat Size</th><th>Head Circumference</th></tr></thead>
           <tbody>
@@ -618,11 +606,16 @@
     });
   }
   renderSizeGrid('jersey-sizes', 'jersey_size', JERSEY_SIZES);
-  renderSizeGrid('practice-sizes', 'practice_jersey_size', JERSEY_SIZES);
-  renderSizeGrid('black-sizes', 'black_hat_size', HAT_SIZES);
-  renderSizeGrid('grey-sizes', 'grey_hat_size', HAT_SIZES);
+  renderSizeGrid('hat-sizes',    'hat_size',    HAT_SIZES);
 
   // Quantity steppers
+  const hatSizeWrap = document.getElementById('hat-size-wrap');
+  function updateHatSizeVisibility() {
+    const anyHat = (parseInt(document.getElementById('black_hat_qty').value, 10) || 0) +
+                   (parseInt(document.getElementById('grey_hat_qty').value, 10) || 0) > 0;
+    hatSizeWrap.classList.toggle('show', anyHat);
+  }
+
   document.querySelectorAll('[data-stepper]').forEach(stepper => {
     const key = stepper.dataset.stepper;
     const valEl = document.getElementById(`${key}-qty`);
@@ -631,8 +624,7 @@
       key === 'black'    ? 'black_hat_qty' :
                            'grey_hat_qty'
     );
-    const sizeWrap = document.getElementById(`${key}-size-wrap`);
-    const hint     = document.getElementById(`${key}-hint`);
+    const hint = document.getElementById(`${key}-hint`);
 
     stepper.querySelectorAll('.qty-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -641,18 +633,9 @@
         v = Math.max(0, Math.min(10, v + step));
         valEl.textContent = v;
         hidden.value = v;
-        if (sizeWrap) sizeWrap.classList.toggle('show', v > 0);
         if (hint) hint.classList.toggle('hidden', v > 0);
+        if (key === 'black' || key === 'grey') updateHatSizeVisibility();
       });
-    });
-  });
-
-  // Chart toggles
-  document.querySelectorAll('[data-toggle]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = document.getElementById(btn.dataset.toggle);
-      const open = target.classList.toggle('open');
-      btn.textContent = btn.textContent.replace(/^(View|Hide)/, open ? 'Hide' : 'View');
     });
   });
 
@@ -665,32 +648,29 @@
     e.preventDefault();
     errBox.classList.remove('show');
 
+    const jerseySize   = document.getElementById('jersey_size').value;
+    const hatSize      = document.getElementById('hat_size').value;
+    const practiceQty  = parseInt(document.getElementById('practice_jersey_qty').value, 10) || 0;
+    const blackHatQty  = parseInt(document.getElementById('black_hat_qty').value, 10) || 0;
+    const greyHatQty   = parseInt(document.getElementById('grey_hat_qty').value, 10) || 0;
+
     const data = {
       player_name: document.getElementById('player_name').value.trim(),
-      jersey_size: document.getElementById('jersey_size').value,
-      practice_jersey_qty: parseInt(document.getElementById('practice_jersey_qty').value, 10) || 0,
-      practice_jersey_size: document.getElementById('practice_jersey_size').value || null,
-      black_hat_qty: parseInt(document.getElementById('black_hat_qty').value, 10) || 0,
-      black_hat_size: document.getElementById('black_hat_size').value || null,
-      grey_hat_qty: parseInt(document.getElementById('grey_hat_qty').value, 10) || 0,
-      grey_hat_size: document.getElementById('grey_hat_size').value || null,
+      jersey_size: jerseySize,
+      practice_jersey_qty:  practiceQty,
+      practice_jersey_size: practiceQty > 0 ? jerseySize : null,
+      black_hat_qty:  blackHatQty,
+      black_hat_size: blackHatQty > 0 ? hatSize : null,
+      grey_hat_qty:   greyHatQty,
+      grey_hat_size:  greyHatQty  > 0 ? hatSize : null,
       notes: document.getElementById('notes').value.trim() || null,
     };
 
     // Validate
     if (!data.player_name) return showError('Please enter the player name.');
     if (!data.jersey_size) return showError('Please select a game jersey size.');
-    if (data.practice_jersey_qty > 0 && !data.practice_jersey_size)
-      return showError('Please select a size for the practice jerseys.');
-    if (data.black_hat_qty > 0 && !data.black_hat_size)
-      return showError('Please select a size for the black hat.');
-    if (data.grey_hat_qty > 0 && !data.grey_hat_size)
-      return showError('Please select a size for the grey hat.');
-
-    // Null out size fields when qty is 0 (keep DB clean)
-    if (data.practice_jersey_qty === 0) data.practice_jersey_size = null;
-    if (data.black_hat_qty === 0)       data.black_hat_size = null;
-    if (data.grey_hat_qty === 0)        data.grey_hat_size = null;
+    if ((blackHatQty > 0 || greyHatQty > 0) && !hatSize)
+      return showError('Please select a hat size.');
 
     submitBtn.disabled = true;
     submitBtn.textContent = 'Submitting…';
