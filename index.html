@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SFL Thunder Black — Uniform Order</title>
+<title>SFL Thunder DeSane — Uniform Updates</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -401,9 +401,9 @@
         <path d="M13 2L4.5 13.5H11L9 22L19.5 10H13L13 2Z"/>
       </svg>
     </div>
-    <h1>Uniform Order Form</h1>
-    <div class="sub">SFL Thunder Black · 8U Coach Pitch</div>
-    <div class="season">Spring 2026 Season</div>
+    <h1>Uniform Updates</h1>
+    <div class="sub">SFL Thunder DeSane · 8U Coach Pitch</div>
+    <div class="season">Fall 2026 Season</div>
   </div>
 
   <form id="uniform-form" autocomplete="off">
@@ -414,7 +414,7 @@
         <h2>Player</h2>
         <span class="section-tag">Step 1</span>
       </div>
-      <div class="section-desc">Who is this uniform order for?</div>
+      <div class="section-desc">Who is this uniform update for?</div>
       <div class="field">
         <label class="label" for="player_name">Player Name <span class="req">*</span></label>
         <input type="text" id="player_name" name="player_name" required placeholder="First and last name">
@@ -549,7 +549,7 @@
       <textarea id="notes" name="notes" placeholder="Between sizes, special requests, etc."></textarea>
     </div>
 
-    <button type="submit" class="submit-btn" id="submit-btn">Submit Order</button>
+    <button type="submit" class="submit-btn" id="submit-btn">Submit Updates</button>
     <div class="error-msg" id="error-msg"></div>
 
     <div class="footer-note">Questions? Reach out to Coach Joe.</div>
@@ -563,8 +563,8 @@
       <polyline points="20 6 9 17 4 12"></polyline>
     </svg>
   </div>
-  <h2>Order Submitted</h2>
-  <p>Thanks — we've got your uniform order on file.</p>
+  <h2>Updates Submitted</h2>
+  <p>Thanks — we've got your uniform updates on file.</p>
   <div class="success-summary" id="success-summary"></div>
 </div>
 
@@ -693,7 +693,7 @@
       showSuccess(data);
     } catch (err) {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Order';
+      submitBtn.textContent = 'Submit Updates';
       showError('Could not submit order. Please try again or reach out to Coach Joe.');
       console.error(err);
     }
