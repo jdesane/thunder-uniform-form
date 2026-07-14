@@ -247,15 +247,24 @@
     gap: 10px;
     font-weight: 600;
     font-size: 14px;
+    white-space: nowrap;
   }
-  .swatch {
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    border: 1px solid var(--border-strong);
+  .hat-icon {
+    width: 32px;
+    height: 23px;
+    flex-shrink: 0;
+    display: block;
   }
-  .swatch.black { background: #111; }
-  .swatch.grey  { background: #9aa0a6; }
+  .hat-hint {
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .hat-hint.hidden { display: none; }
+  @media (max-width: 420px) {
+    .hat-hint { display: none; }
+  }
 
   .qty-row {
     display: flex;
@@ -475,10 +484,15 @@
       <div class="hat-card">
         <div class="hat-head">
           <div class="hat-title">
-            <span class="swatch black"></span>
+            <svg class="hat-icon" viewBox="0 0 36 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 17 Q6 4 18 4 Q30 4 30 17 Z" fill="#111" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
+              <path d="M2 17 Q18 15 34 17 Q34 20 18 21 Q2 20 2 17 Z" fill="#111" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
+              <path d="M19 8 L16 14 L17.7 14 L16.8 17 L19.8 12.5 L18 12.5 L19 8 Z" fill="#f5b800"/>
+            </svg>
             Black Hat
           </div>
           <div class="qty-row">
+            <span class="hat-hint" id="black-hint">Tap + to add</span>
             <div class="qty-stepper" data-stepper="black">
               <button type="button" class="qty-btn" data-step="-1">−</button>
               <span class="qty-val" id="black-qty">0</span>
@@ -498,10 +512,15 @@
       <div class="hat-card">
         <div class="hat-head">
           <div class="hat-title">
-            <span class="swatch grey"></span>
+            <svg class="hat-icon" viewBox="0 0 36 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 17 Q6 4 18 4 Q30 4 30 17 Z" fill="#9aa0a6" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>
+              <path d="M2 17 Q18 15 34 17 Q34 20 18 21 Q2 20 2 17 Z" fill="#9aa0a6" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>
+              <path d="M19 8 L16 14 L17.7 14 L16.8 17 L19.8 12.5 L18 12.5 L19 8 Z" fill="#f5b800"/>
+            </svg>
             Grey Hat
           </div>
           <div class="qty-row">
+            <span class="hat-hint" id="grey-hint">Tap + to add</span>
             <div class="qty-stepper" data-stepper="grey">
               <button type="button" class="qty-btn" data-step="-1">−</button>
               <span class="qty-val" id="grey-qty">0</span>
@@ -613,6 +632,7 @@
                            'grey_hat_qty'
     );
     const sizeWrap = document.getElementById(`${key}-size-wrap`);
+    const hint     = document.getElementById(`${key}-hint`);
 
     stepper.querySelectorAll('.qty-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -622,6 +642,7 @@
         valEl.textContent = v;
         hidden.value = v;
         if (sizeWrap) sizeWrap.classList.toggle('show', v > 0);
+        if (hint) hint.classList.toggle('hidden', v > 0);
       });
     });
   });
