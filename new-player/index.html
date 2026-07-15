@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SFL Thunder DeSane — New Player Intake</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:            #0b0d10;
+    --bg-elev:       #14171c;
+    --bg-elev-2:     #1a1e24;
+    --bg-hover:      #1e2229;
+    --border:        rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.16);
+    --text:          #e8ecf0;
+    --text-muted:    #8b929c;
+    --text-subtle:   #5a6068;
+    --gold:          #f5b800;
+    --gold-soft:     rgba(245,184,0,0.12);
+    --pos:           #22c55e;
+    --neg:           #ef4444;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace; }
+  .wrap { max-width: 640px; margin: 0 auto; padding: 24px 16px 80px; }
+
+  .header { text-align: center; padding: 24px 0 28px; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+  .bolt {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--gold-soft); margin-bottom: 12px;
+  }
+  .bolt svg { width: 28px; height: 28px; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+  .header .sub { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+  .header .season {
+    display: inline-block; margin-top: 10px; padding: 3px 10px;
+    border-radius: 999px; background: var(--bg-elev); border: 1px solid var(--border);
+    color: var(--text-muted); font-size: 11px; letter-spacing: 0.06em;
+    text-transform: uppercase; font-weight: 500;
+  }
+
+  .section {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px;
+  }
+  .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 4px; }
+  .section h2 { font-size: 15px; font-weight: 600; letter-spacing: -0.005em; }
+  .section-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); font-weight: 600; }
+  .section-desc { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .label {
+    display: block; font-size: 12px; font-weight: 500; color: var(--text-muted);
+    margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .req { color: var(--gold); }
+
+  input[type="text"], input[type="number"], input[type="date"], select, textarea {
+    width: 100%;
+    background: var(--bg-elev-2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 11px 12px; color: var(--text); font-family: inherit; font-size: 15px;
+    transition: border-color 0.15s, background 0.15s;
+    color-scheme: dark;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--gold); background: var(--bg-hover);
+  }
+  textarea { resize: vertical; min-height: 72px; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  /* Size buttons */
+  .size-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .size-grid.two-col { grid-template-columns: 1fr 1fr; }
+  .size-btn {
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 4px; text-align: center;
+    cursor: pointer; transition: all 0.12s; user-select: none;
+  }
+  .size-btn:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  .size-btn.selected {
+    background: var(--gold-soft); border-color: var(--gold); color: var(--gold);
+  }
+  .size-btn .code { display: block; font-weight: 600; font-size: 14px; letter-spacing: 0.02em; }
+  .size-btn .measure { display: block; font-size: 10px; color: var(--text-subtle); margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .size-btn.selected .measure { color: var(--gold); opacity: 0.75; }
+
+  /* Choice cards (for pant style, helmet addon) */
+  .choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .choice-card {
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 12px; cursor: pointer;
+    transition: all 0.12s; user-select: none; text-align: left;
+  }
+  .choice-card:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  .choice-card.selected { background: var(--gold-soft); border-color: var(--gold); }
+  .choice-card .ct { font-weight: 600; font-size: 14px; display: block; }
+  .choice-card.selected .ct { color: var(--gold); }
+  .choice-card .cs { font-size: 12px; color: var(--text-subtle); margin-top: 2px; display: block; }
+
+  /* Helmet addon with pictures */
+  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .addon-card {
+    background: var(--bg-elev-2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; cursor: pointer;
+    transition: all 0.12s; text-align: center; user-select: none;
+  }
+  .addon-card:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  .addon-card.selected { background: var(--gold-soft); border-color: var(--gold); }
+  .addon-card .img-wrap {
+    background: var(--bg); border-radius: 6px; padding: 8px; margin-bottom: 8px;
+    height: 90px; display: flex; align-items: center; justify-content: center;
+  }
+  .addon-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .addon-card .placeholder {
+    color: var(--text-subtle); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .addon-card .ct { font-weight: 600; font-size: 13px; display: block; }
+  .addon-card.selected .ct { color: var(--gold); }
+
+  /* Charts */
+  .chart {
+    margin-top: 10px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px;
+  }
+  .chart table { width: 100%; font-size: 12px; border-collapse: collapse; }
+  .chart th, .chart td {
+    text-align: left; padding: 6px 8px; color: var(--text-muted);
+    font-weight: 500; font-variant-numeric: tabular-nums;
+  }
+  .chart th { color: var(--text-subtle); font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--border); }
+  .chart td:first-child { color: var(--text); font-weight: 600; }
+
+  /* Quantity stepper */
+  .qty-row { display: flex; align-items: center; gap: 10px; }
+  .qty-label { font-size: 12px; color: var(--text-muted); }
+  .qty-stepper {
+    display: inline-flex; align-items: center; background: var(--bg);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .qty-btn {
+    width: 34px; height: 34px; background: none; border: none;
+    color: var(--text); font-size: 18px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: background 0.12s;
+  }
+  .qty-btn:hover { background: var(--bg-hover); }
+  .qty-val { min-width: 32px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .submit-btn {
+    width: 100%; background: var(--gold); color: #0b0d10;
+    border: none; border-radius: 10px; padding: 15px;
+    font-family: inherit; font-size: 15px; font-weight: 700; letter-spacing: 0.01em;
+    cursor: pointer; margin-top: 8px; transition: filter 0.15s, transform 0.05s;
+  }
+  .submit-btn:hover { filter: brightness(1.05); }
+  .submit-btn:active { transform: translateY(1px); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .footer-note { text-align: center; color: var(--text-subtle); font-size: 12px; margin-top: 20px; }
+
+  .success { text-align: center; padding: 60px 20px; display: none; }
+  .success.show { display: block; }
+  .success-icon {
+    width: 64px; height: 64px; margin: 0 auto 20px; border-radius: 50%;
+    background: rgba(34,197,94,0.15); display: flex; align-items: center; justify-content: center;
+  }
+  .success-icon svg { width: 32px; height: 32px; stroke: var(--pos); }
+  .success h2 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+  .success p { color: var(--text-muted); font-size: 14px; }
+  .success-summary {
+    margin: 24px auto 0; max-width: 440px; background: var(--bg-elev);
+    border: 1px solid var(--border); border-radius: 10px; padding: 16px;
+    text-align: left; font-size: 13px;
+  }
+  .success-summary .row {
+    display: flex; justify-content: space-between; gap: 12px;
+    padding: 6px 0; border-bottom: 1px solid var(--border);
+  }
+  .success-summary .row:last-child { border-bottom: none; }
+  .success-summary .row .k { color: var(--text-muted); }
+  .success-summary .row .v { color: var(--text); font-weight: 500; text-align: right; }
+
+  .error-msg {
+    background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3);
+    color: #fca5a5; padding: 12px; border-radius: 8px; font-size: 13px;
+    margin-top: 12px; display: none;
+  }
+  .error-msg.show { display: block; }
+
+  @media (max-width: 480px) {
+    .size-grid { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+    .size-btn { padding: 10px 2px; }
+    .size-btn .measure { font-size: 9px; }
+    .section { padding: 16px; }
+    .choice-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="form-wrap">
+
+  <div class="header">
+    <div class="bolt">
+      <svg viewBox="0 0 24 24" fill="var(--gold)" xmlns="http://www.w3.org/2000/svg">
+        <path d="M13 2L4.5 13.5H11L9 22L19.5 10H13L13 2Z"/>
+      </svg>
+    </div>
+    <h1>New Player Intake</h1>
+    <div class="sub">SFL Thunder DeSane</div>
+    <div class="season">Fall 2026 Season</div>
+  </div>
+
+  <form id="intake-form" autocomplete="off">
+
+    <!-- PLAYER INFO -->
+    <div class="section">
+      <div class="section-head"><h2>Player Info</h2><span class="section-tag">Step 1</span></div>
+      <div class="section-desc">Basics we need for the roster.</div>
+
+      <div class="field row-2">
+        <div>
+          <label class="label">First Name <span class="req">*</span></label>
+          <input type="text" id="first_name" required>
+        </div>
+        <div>
+          <label class="label">Last Name <span class="req">*</span></label>
+          <input type="text" id="last_name" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="dob">Date of Birth <span class="req">*</span></label>
+        <input type="date" id="dob" required>
+      </div>
+
+      <div class="field">
+        <label class="label" for="address">Address <span class="req">*</span></label>
+        <textarea id="address" required placeholder="Street, City, State ZIP"></textarea>
+      </div>
+    </div>
+
+    <!-- JERSEY NUMBER -->
+    <div class="section">
+      <div class="section-head"><h2>Jersey Number Preferences</h2><span class="section-tag">Step 2</span></div>
+      <div class="section-desc">List 3 numbers in order of preference. We'll get as close as we can based on what's available.</div>
+      <div class="field row-3">
+        <div>
+          <label class="label">1st Choice <span class="req">*</span></label>
+          <input type="text" id="jersey_num_1" required inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2" placeholder="e.g. 7">
+        </div>
+        <div>
+          <label class="label">2nd Choice</label>
+          <input type="text" id="jersey_num_2" inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2">
+        </div>
+        <div>
+          <label class="label">3rd Choice</label>
+          <input type="text" id="jersey_num_3" inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2">
+        </div>
+      </div>
+    </div>
+
+    <!-- JERSEY SIZE -->
+    <div class="section">
+      <div class="section-head"><h2>Game Jersey Size</h2><span class="section-tag">Step 3</span></div>
+      <div class="section-desc">Full-button youth jersey. Practice jerseys will use this same size.</div>
+      <div class="size-grid" id="jersey-sizes"></div>
+      <input type="hidden" id="jersey_size" required>
+      <div class="chart">
+        <table>
+          <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th></tr></thead>
+          <tbody>
+            <tr><td>YXS</td><td>15.7"</td><td>22.6"</td><td>7.7"</td></tr>
+            <tr><td>YS</td><td>16.7"</td><td>24.3"</td><td>8.1"</td></tr>
+            <tr><td>YM</td><td>17.6"</td><td>25.5"</td><td>8.4"</td></tr>
+            <tr><td>YL</td><td>18.8"</td><td>26.7"</td><td>8.7"</td></tr>
+            <tr><td>YXL</td><td>20"</td><td>27.9"</td><td>9.1"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRACTICE JERSEY -->
+    <div class="section">
+      <div class="section-head"><h2>Practice Jerseys</h2><span class="section-tag">Optional</span></div>
+      <div class="section-desc">How many practice jerseys do you need? They'll match your game jersey size.</div>
+      <div class="field">
+        <div class="qty-row">
+          <span class="qty-label">Quantity:</span>
+          <div class="qty-stepper" data-stepper="practice">
+            <button type="button" class="qty-btn" data-step="-1">−</button>
+            <span class="qty-val" id="practice-qty">0</span>
+            <button type="button" class="qty-btn" data-step="1">+</button>
+          </div>
+        </div>
+        <input type="hidden" id="practice_jersey_qty" value="0">
+      </div>
+    </div>
+
+    <!-- PANTS -->
+    <div class="section">
+      <div class="section-head"><h2>Pants</h2><span class="section-tag">Step 4</span></div>
+      <div class="section-desc">Youth pant size and style.</div>
+
+      <div class="field">
+        <label class="label">Pant Size <span class="req">*</span></label>
+        <div class="size-grid" id="pant-sizes"></div>
+        <input type="hidden" id="pant_size" required>
+      </div>
+
+      <div class="field">
+        <label class="label">Pant Style <span class="req">*</span></label>
+        <div class="choice-grid" id="pant-style">
+          <div class="choice-card" data-value="knickers">
+            <span class="ct">Knickers</span>
+            <span class="cs">To the knee</span>
+          </div>
+          <div class="choice-card" data-value="regular">
+            <span class="ct">Regular</span>
+            <span class="cs">Full-length</span>
+          </div>
+          <div class="choice-card" data-value="both" style="grid-column: 1 / -1">
+            <span class="ct">One of each</span>
+            <span class="cs">One pair knickers + one pair regular</span>
+          </div>
+        </div>
+        <input type="hidden" id="pant_style" required>
+      </div>
+
+      <div class="chart">
+        <table>
+          <thead><tr><th>Size</th><th>Waist</th><th>Hips</th><th>Height</th></tr></thead>
+          <tbody>
+            <tr><td>YXS</td><td>23–24</td><td>26–27</td><td>47–50½</td></tr>
+            <tr><td>YS</td><td>24–25</td><td>27–28</td><td>50½–53</td></tr>
+            <tr><td>YM</td><td>25–27</td><td>28–31</td><td>53–59</td></tr>
+            <tr><td>YL</td><td>27–30</td><td>31–34</td><td>59–65</td></tr>
+            <tr><td>YXL</td><td>30–33</td><td>34–37</td><td>65–70</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- HELMET -->
+    <div class="section">
+      <div class="section-head"><h2>Helmet</h2><span class="section-tag">Step 5</span></div>
+      <div class="section-desc">Pick the size and any add-ons.</div>
+
+      <div class="field">
+        <label class="label">Helmet Size <span class="req">*</span></label>
+        <div class="size-grid two-col" id="helmet-sizes"></div>
+        <input type="hidden" id="helmet_size" required>
+      </div>
+
+      <div class="field">
+        <label class="label">Helmet Add-Ons <span class="req">*</span></label>
+        <div class="addon-grid" id="helmet-addon">
+          <div class="addon-card" data-value="cage">
+            <div class="img-wrap"><img src="../helmet-cage.jpg" alt="Cage" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Cage (photo)'}))"></div>
+            <span class="ct">Cage</span>
+          </div>
+          <div class="addon-card" data-value="face_guard">
+            <div class="img-wrap"><img src="../helmet-face-guard.jpg" alt="Face Guard" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Face Guard (photo)'}))"></div>
+            <span class="ct">Face Guard</span>
+          </div>
+          <div class="addon-card" data-value="both">
+            <div class="img-wrap"><div class="placeholder">Cage + Face Guard</div></div>
+            <span class="ct">Both</span>
+          </div>
+          <div class="addon-card" data-value="neither">
+            <div class="img-wrap"><div class="placeholder">No add-ons</div></div>
+            <span class="ct">Neither</span>
+          </div>
+        </div>
+        <input type="hidden" id="helmet_addon" required>
+      </div>
+    </div>
+
+    <!-- HAT -->
+    <div class="section">
+      <div class="section-head"><h2>Hat Size</h2><span class="section-tag">Step 6</span></div>
+      <div class="section-desc">Stretch-fit sizing. We'll get you both a black and grey hat.</div>
+      <div class="size-grid" id="hat-sizes"></div>
+      <input type="hidden" id="hat_size" required>
+      <div class="chart">
+        <table>
+          <thead><tr><th>Size</th><th>Hat Size</th><th>Head Circumference</th></tr></thead>
+          <tbody>
+            <tr><td>XS</td><td>6½" – 6¾"</td><td>20½" – 21½"</td></tr>
+            <tr><td>S</td><td>6⅞" – 7⅛"</td><td>21¾" – 22⅜"</td></tr>
+            <tr><td>M</td><td>7⅛" – 7⅜"</td><td>22⅜" – 23¼"</td></tr>
+            <tr><td>L</td><td>7⅜" – 7⅝"</td><td>23¼" – 24"</td></tr>
+            <tr><td>XL</td><td>7⅝" – 8"</td><td>24" – 25¼"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="section">
+      <div class="section-head"><h2>Notes</h2><span class="section-tag">Optional</span></div>
+      <div class="section-desc">Anything else we should know?</div>
+      <textarea id="notes" placeholder="Between sizes, allergies, special requests, etc."></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">Submit Intake</button>
+    <div class="error-msg" id="error-msg"></div>
+
+    <div class="footer-note">Questions? Reach out to Coach Joe.</div>
+  </form>
+</div>
+
+<div class="wrap success" id="success-screen">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+  <h2>Welcome to Thunder</h2>
+  <p>Thanks — we've got your intake info on file.</p>
+  <div class="success-summary" id="success-summary"></div>
+</div>
+
+<script>
+  const SUPA_URL = "https://zyonidiybzrgklrmalbt.supabase.co";
+  const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5b25pZGl5YnpyZ2tscm1hbGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MTY5NzUsImV4cCI6MjA4ODI5Mjk3NX0.5See-qjLkXA4CoJi9tNfcLAX_cdvZhPaxw8iViKM8S8";
+
+  const JERSEY_SIZES = [
+    { code: 'YXS', measure: '15.7"' },
+    { code: 'YS',  measure: '16.7"' },
+    { code: 'YM',  measure: '17.6"' },
+    { code: 'YL',  measure: '18.8"' },
+    { code: 'YXL', measure: '20"' },
+  ];
+  const PANT_SIZES = [
+    { code: 'YXS', measure: '23–24' },
+    { code: 'YS',  measure: '24–25' },
+    { code: 'YM',  measure: '25–27' },
+    { code: 'YL',  measure: '27–30' },
+    { code: 'YXL', measure: '30–33' },
+  ];
+  const HAT_SIZES = [
+    { code: 'XS', measure: '20½"' },
+    { code: 'S',  measure: '22"' },
+    { code: 'M',  measure: '22¾"' },
+    { code: 'L',  measure: '23½"' },
+    { code: 'XL', measure: '24½"' },
+  ];
+  const HELMET_SIZES = [
+    { code: 'S', measure: '6¼" – 7"' },
+    { code: 'M', measure: '7" – 7¾"' },
+  ];
+
+  function renderSizeGrid(containerId, hiddenId, sizes) {
+    const container = document.getElementById(containerId);
+    const hidden = document.getElementById(hiddenId);
+    container.innerHTML = '';
+    sizes.forEach(sz => {
+      const btn = document.createElement('div');
+      btn.className = 'size-btn';
+      btn.dataset.size = sz.code;
+      btn.innerHTML = `<span class="code">${sz.code}</span><span class="measure">${sz.measure}</span>`;
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        hidden.value = sz.code;
+      });
+      container.appendChild(btn);
+    });
+  }
+  renderSizeGrid('jersey-sizes', 'jersey_size', JERSEY_SIZES);
+  renderSizeGrid('pant-sizes',   'pant_size',   PANT_SIZES);
+  renderSizeGrid('hat-sizes',    'hat_size',    HAT_SIZES);
+  renderSizeGrid('helmet-sizes', 'helmet_size', HELMET_SIZES);
+
+  // Choice cards (pant style, helmet addon)
+  function wireChoiceGroup(containerId, hiddenId) {
+    const container = document.getElementById(containerId);
+    const hidden = document.getElementById(hiddenId);
+    container.querySelectorAll('[data-value]').forEach(card => {
+      card.addEventListener('click', () => {
+        container.querySelectorAll('[data-value]').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        hidden.value = card.dataset.value;
+      });
+    });
+  }
+  wireChoiceGroup('pant-style', 'pant_style');
+  wireChoiceGroup('helmet-addon', 'helmet_addon');
+
+  // Practice qty stepper
+  document.querySelectorAll('[data-stepper]').forEach(stepper => {
+    const key = stepper.dataset.stepper;
+    const valEl = document.getElementById(`${key}-qty`);
+    const hidden = document.getElementById('practice_jersey_qty');
+    stepper.querySelectorAll('.qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const step = parseInt(btn.dataset.step, 10);
+        let v = parseInt(valEl.textContent, 10) || 0;
+        v = Math.max(0, Math.min(10, v + step));
+        valEl.textContent = v;
+        hidden.value = v;
+      });
+    });
+  });
+
+  // Submit
+  const form = document.getElementById('intake-form');
+  const errBox = document.getElementById('error-msg');
+  const submitBtn = document.getElementById('submit-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errBox.classList.remove('show');
+
+    const g = id => document.getElementById(id);
+    const data = {
+      first_name: g('first_name').value.trim(),
+      last_name:  g('last_name').value.trim(),
+      dob:        g('dob').value,
+      address:    g('address').value.trim(),
+      jersey_num_1: g('jersey_num_1').value.trim(),
+      jersey_num_2: g('jersey_num_2').value.trim() || null,
+      jersey_num_3: g('jersey_num_3').value.trim() || null,
+      jersey_size: g('jersey_size').value,
+      practice_jersey_qty: parseInt(g('practice_jersey_qty').value, 10) || 0,
+      pant_size:  g('pant_size').value,
+      pant_style: g('pant_style').value,
+      helmet_size: g('helmet_size').value,
+      helmet_addon: g('helmet_addon').value,
+      hat_size:   g('hat_size').value,
+      notes:      g('notes').value.trim() || null,
+    };
+
+    if (!data.first_name || !data.last_name) return showError('Please enter the player name.');
+    if (!data.dob)          return showError('Please enter the date of birth.');
+    if (!data.address)      return showError('Please enter the address.');
+    if (!data.jersey_num_1) return showError('Please enter at least one jersey number preference.');
+    if (!data.jersey_size)  return showError('Please select a jersey size.');
+    if (!data.pant_size)    return showError('Please select a pant size.');
+    if (!data.pant_style)   return showError('Please select a pant style.');
+    if (!data.helmet_size)  return showError('Please select a helmet size.');
+    if (!data.helmet_addon) return showError('Please select helmet add-ons (Neither is fine).');
+    if (!data.hat_size)     return showError('Please select a hat size.');
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    try {
+      const res = await fetch(SUPA_URL + '/rest/v1/player_intakes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      showSuccess(data);
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Intake';
+      showError('Could not submit. Please try again or reach out to Coach Joe.');
+      console.error(err);
+    }
+  });
+
+  function showError(msg) {
+    errBox.textContent = msg;
+    errBox.classList.add('show');
+    errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  const STYLE_LABEL = { knickers: 'Knickers', regular: 'Regular', both: 'One of each' };
+  const ADDON_LABEL = { cage: 'Cage', face_guard: 'Face Guard', both: 'Cage + Face Guard', neither: 'Neither' };
+
+  function showSuccess(data) {
+    document.getElementById('form-wrap').style.display = 'none';
+    const numbers = [data.jersey_num_1, data.jersey_num_2, data.jersey_num_3].filter(Boolean).join(', #');
+    const rows = [
+      ['Player',      `${data.first_name} ${data.last_name}`],
+      ['DOB',         data.dob],
+      ['Address',     data.address],
+      ['Jersey #',    '#' + numbers],
+      ['Game Jersey', data.jersey_size],
+      ['Practice Jerseys', data.practice_jersey_qty > 0 ? `${data.practice_jersey_qty} × ${data.jersey_size}` : 'None'],
+      ['Pants',       `${data.pant_size} · ${STYLE_LABEL[data.pant_style]}`],
+      ['Helmet',      `${data.helmet_size} · ${ADDON_LABEL[data.helmet_addon]}`],
+      ['Hat',         data.hat_size],
+    ];
+    document.getElementById('success-summary').innerHTML = rows.map(([k,v]) =>
+      `<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`
+    ).join('');
+    document.getElementById('success-screen').classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
