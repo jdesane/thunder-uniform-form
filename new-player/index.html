@@ -113,25 +113,42 @@
   .choice-card.selected .ct { color: var(--gold); }
   .choice-card .cs { font-size: 12px; color: var(--text-subtle); margin-top: 2px; display: block; }
 
-  /* Helmet addon with pictures */
-  .addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .addon-card {
+  /* Helmet addon checkbox rows */
+  .addon-list { display: flex; flex-direction: column; gap: 8px; }
+  .addon-row {
+    display: flex; align-items: center; gap: 14px;
     background: var(--bg-elev-2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px; cursor: pointer;
-    transition: all 0.12s; text-align: center; user-select: none;
+    border-radius: 10px; padding: 12px 14px; cursor: pointer;
+    transition: all 0.12s; user-select: none;
   }
-  .addon-card:hover { background: var(--bg-hover); border-color: var(--border-strong); }
-  .addon-card.selected { background: var(--gold-soft); border-color: var(--gold); }
-  .addon-card .img-wrap {
-    background: var(--bg); border-radius: 6px; padding: 8px; margin-bottom: 8px;
-    height: 90px; display: flex; align-items: center; justify-content: center;
+  .addon-row:hover { background: var(--bg-hover); border-color: var(--border-strong); }
+  .addon-row.selected { background: var(--gold-soft); border-color: var(--gold); }
+  .addon-check {
+    appearance: none; -webkit-appearance: none;
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 1.5px solid var(--border-strong); background: var(--bg);
+    cursor: pointer; flex-shrink: 0; position: relative;
+    transition: all 0.12s;
   }
-  .addon-card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .addon-card .placeholder {
-    color: var(--text-subtle); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  .addon-check:checked { background: var(--gold); border-color: var(--gold); }
+  .addon-check:checked::after {
+    content: ''; position: absolute; left: 6px; top: 2px;
+    width: 6px; height: 12px;
+    border: solid #0b0d10; border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
   }
-  .addon-card .ct { font-weight: 600; font-size: 13px; display: block; }
-  .addon-card.selected .ct { color: var(--gold); }
+  .addon-thumb {
+    width: 56px; height: 56px; border-radius: 6px;
+    background: #fff; padding: 4px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .addon-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .addon-thumb .placeholder {
+    color: var(--text-subtle); font-size: 9px; text-transform: uppercase;
+    letter-spacing: 0.04em; text-align: center; color: #666;
+  }
+  .addon-row .ct { font-weight: 600; font-size: 14px; }
+  .addon-row.selected .ct { color: var(--gold); }
 
   /* Charts */
   .chart {
@@ -370,23 +387,22 @@
 
       <div class="field">
         <label class="label">Helmet Add-Ons <span class="req">*</span></label>
-        <div class="addon-grid" id="helmet-addon">
-          <div class="addon-card" data-value="cage">
-            <div class="img-wrap"><img src="../helmet-cage.webp" alt="Cage" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Cage (photo)'}))"></div>
+        <div class="section-desc" style="margin:-2px 0 10px">Check any that apply. Leave all unchecked and pick "Neither" if none.</div>
+        <div class="addon-list" id="helmet-addon">
+          <label class="addon-row" data-addon="cage">
+            <input type="checkbox" class="addon-check" data-key="cage">
+            <div class="addon-thumb"><img src="../helmet-cage.webp" alt="Cage" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Cage'}))"></div>
             <span class="ct">Cage</span>
-          </div>
-          <div class="addon-card" data-value="face_guard">
-            <div class="img-wrap"><img src="../helmet-face-guard.jpg" alt="Face Guard" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Face Guard (photo)'}))"></div>
+          </label>
+          <label class="addon-row" data-addon="face_guard">
+            <input type="checkbox" class="addon-check" data-key="face_guard">
+            <div class="addon-thumb"><img src="../helmet-face-guard.jpg" alt="Face Guard" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'placeholder',textContent:'Face Guard'}))"></div>
             <span class="ct">Face Guard</span>
-          </div>
-          <div class="addon-card" data-value="both">
-            <div class="img-wrap"><div class="placeholder">Cage + Face Guard</div></div>
-            <span class="ct">Both</span>
-          </div>
-          <div class="addon-card" data-value="neither">
-            <div class="img-wrap"><div class="placeholder">No add-ons</div></div>
+          </label>
+          <label class="addon-row" data-addon="neither">
+            <input type="checkbox" class="addon-check" data-key="neither">
             <span class="ct">Neither</span>
-          </div>
+          </label>
         </div>
         <input type="hidden" id="helmet_addon" required>
       </div>
@@ -502,7 +518,33 @@
     });
   }
   wireChoiceGroup('pant-style', 'pant_style');
-  wireChoiceGroup('helmet-addon', 'helmet_addon');
+
+  // Helmet add-ons: checkboxes with mutual exclusivity between Neither and the others
+  (function wireHelmetAddons() {
+    const container = document.getElementById('helmet-addon');
+    const hidden = document.getElementById('helmet_addon');
+    const boxes = container.querySelectorAll('.addon-check');
+    boxes.forEach(box => {
+      box.addEventListener('change', () => {
+        if (box.checked) {
+          if (box.dataset.key === 'neither') {
+            boxes.forEach(b => { if (b !== box) b.checked = false; });
+          } else {
+            const neither = container.querySelector('[data-key="neither"]');
+            if (neither.checked) neither.checked = false;
+          }
+        }
+        container.querySelectorAll('.addon-row').forEach(row => {
+          const check = row.querySelector('.addon-check');
+          row.classList.toggle('selected', check.checked);
+        });
+        const cage = container.querySelector('[data-key="cage"]').checked;
+        const fg   = container.querySelector('[data-key="face_guard"]').checked;
+        const nei  = container.querySelector('[data-key="neither"]').checked;
+        hidden.value = cage && fg ? 'both' : cage ? 'cage' : fg ? 'face_guard' : nei ? 'neither' : '';
+      });
+    });
+  })();
 
   // Practice qty stepper
   document.querySelectorAll('[data-stepper]').forEach(stepper => {
